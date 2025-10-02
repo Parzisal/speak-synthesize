@@ -1,0 +1,49 @@
+# ========================
+# Node.js
+# ========================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+*.egg-info/
+*.eggs
+*.pytest_cache/
+*.mypy_cache/
+
+# ========================
+# Docker
+# ========================
+# Логи и образы
+docker-compose.override.yml
+*.log
+*.tmp
+
+# ========================
+# IDE / OS
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ========================
+# Build / Output
+# ========================
+dist/
+build/
+*.mp3
+*.wav
+*.ogg
