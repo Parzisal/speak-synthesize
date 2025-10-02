@@ -19,7 +19,8 @@ model, _ = torch.hub.load(
     repo_or_dir='snakers4/silero-models',
     model='silero_tts',
     language=language,
-    speaker=model_id
+    speaker=model_id,
+    trust_repo=True
 )
 model.to(device)
 
