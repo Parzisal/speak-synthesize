@@ -1,4 +1,8 @@
-fastapi
-uvicorn
+# fastapi
+# uvicorn
+# torch
+# pydub
+
 torch
+torchaudio
 pydub
