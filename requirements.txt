@@ -1,9 +1,10 @@
-# fastapi
-# uvicorn
-# torch
-# pydub
-
 torch
 torchaudio
 pydub
 numpy
+omegaconf
+# old
+# fastapi
+# uvicorn
+# torch
+# pydub
