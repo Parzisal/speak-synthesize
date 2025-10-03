@@ -25,10 +25,13 @@ jobs:
         run: |
           scp -r -i ~/.ssh/id_rsa . root@${{ secrets.BEGET_HOST }}:/root/app
 
-      # 4️⃣ Перезапускаем Docker Compose на сервере
-      - name: Restart Docker Compose
+      # 4️⃣ Строим и запускаем контейнер через Docker
+      - name: Build and run Docker container
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
             cd /root/app
-            docker compose up -d --build
+            docker build -t my_app .
+            docker stop my_app || true
+            docker rm my_app || true
+            docker run -d --name my_app -p 8000:8000 my_app
           "
