@@ -23,6 +23,7 @@ jobs:
       # 3️⃣ Копируем проект на сервер
       - name: Copy project to Beget via SCP
         run: |
+          ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "rm -rf /root/app"
           scp -r -i ~/.ssh/id_rsa . root@${{ secrets.BEGET_HOST }}:/root/app
 
       # 4️⃣ Строим и запускаем контейнер через Docker
