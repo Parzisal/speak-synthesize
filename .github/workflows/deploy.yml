@@ -30,8 +30,8 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
             cd /root/app
-            docker build -t my_app .
-            docker stop my_app || true
-            docker rm my_app || true
-            docker run -d --name my_app -p 8000:8000 my_app
+            docker compose up -d --build
           "
+
+      - name: ✅ Deployment complete
+        run: echo "🎉 Успешный деплой на Beget завершён!"
