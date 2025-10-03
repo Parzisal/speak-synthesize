@@ -116,21 +116,41 @@ function synthesize(text, speed = 1.0, timeoutMs = 15000) {
   });
 }
 
-// API endpoint
+// === старый endpoint, возвращает raw MP3 ===
 app.post("/speak", async (req, res) => {
   try {
     const { text, speed = 1.3 } = req.body;
     if (typeof text !== "string" || !text.trim())
       return res.status(400).send("Missing text");
 
-    console.log("до async", { text, speed });
     const audio = await synthesize(text, parseFloat(speed) || 1.0);
-    console.log("после async", audio.length);
 
     res.setHeader("Content-Type", "audio/mpeg");
     res.send(audio);
   } catch (e) {
     console.error("speak error:", e);
+    res.status(500).send("Ошибка TTS");
+  }
+});
+
+// === новый endpoint, возвращает Base64 для Cocos ===
+app.post("/speak-base64", async (req, res) => {
+  try {
+    const { text, speed = 1.3 } = req.body;
+    if (typeof text !== "string" || !text.trim())
+      return res.status(400).send("Missing text");
+
+    const audio = await synthesize(text, parseFloat(speed) || 1.0);
+    const audioBase64 = audio.toString("base64");
+
+    res.setHeader("Content-Type", "application/json");
+    res.send(
+      JSON.stringify({
+        base64: audioBase64,
+      })
+    );
+  } catch (e) {
+    console.error("speak-base64 error:", e);
     res.status(500).send("Ошибка TTS");
   }
 });
