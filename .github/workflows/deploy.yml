@@ -11,18 +11,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup SSH key with passphrase
+        run: |
+          echo "${{ secrets.BEGET_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          eval "$(ssh-agent -s)"
+          ssh-add key.pem <<< "${{ secrets.BEGET_SSH_PASSPHRASE }}"
+          mkdir -p ~/.ssh
+          echo "Host *" > ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+
       - name: Copy project to Beget via SCP
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.BEGET_HOST }}
-          username: root
-          key: ${{ secrets.BEGET_SSH_KEY }}
-          source: "."
-          target: "/root/app"
+        run: |
+          scp -r -i key.pem . root@${{ secrets.BEGET_HOST }}:/root/app
 
       - name: Restart Docker Compose
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.BEGET_SSH_KEY }} root@${{ secrets.BEGET_HOST }} "
+          ssh -i key.pem root@${{ secrets.BEGET_HOST }} "
             cd /root/app
             docker compose up -d --build
           "
