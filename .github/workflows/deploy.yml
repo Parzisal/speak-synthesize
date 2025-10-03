@@ -13,13 +13,12 @@ jobs:
 
       - name: Setup SSH key with passphrase
         run: |
-          echo "${{ secrets.BEGET_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
-          eval "$(ssh-agent -s)"
-          ssh-add key.pem <<< "${{ secrets.BEGET_SSH_PASSPHRASE }}"
           mkdir -p ~/.ssh
-          echo "Host *" > ~/.ssh/config
-          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "${{ secrets.BEGET_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa <<< "${{ secrets.BEGET_SSH_PASSPHRASE }}"
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
       - name: Copy project to Beget via SCP
         run: |
