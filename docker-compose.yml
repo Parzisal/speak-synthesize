@@ -11,5 +11,6 @@ services:
     restart: always
     volumes:
       - .:/app
+      - /app/node_modules
     working_dir: /app
     command: ["npm", "start"]
