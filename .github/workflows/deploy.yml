@@ -1,0 +1,28 @@
+name: Deploy to Beget
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Copy project to Beget via SCP
+        uses: appleboy/scp-action@main
+        with:
+          host: ${{ secrets.BEGET_HOST }}
+          username: root
+          key: ${{ secrets.BEGET_SSH_KEY }}
+          source: "."
+          target: "/root/app"
+
+      - name: Restart Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.BEGET_SSH_KEY }} root@${{ secrets.BEGET_HOST }} "
+            cd /root/app
+            docker compose up -d --build
+          "
