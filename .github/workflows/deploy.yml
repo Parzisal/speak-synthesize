@@ -8,25 +8,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Скачиваем код репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup SSH key with passphrase
+      # 2️⃣ Настраиваем SSH ключ без passphrase
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.BEGET_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa <<< "${{ secrets.BEGET_SSH_PASSPHRASE }}"
           echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
+      # 3️⃣ Копируем проект на сервер
       - name: Copy project to Beget via SCP
         run: |
-          scp -r -i key.pem . root@${{ secrets.BEGET_HOST }}:/root/app
+          scp -r -i ~/.ssh/id_rsa . root@${{ secrets.BEGET_HOST }}:/root/app
 
+      # 4️⃣ Перезапускаем Docker Compose на сервере
       - name: Restart Docker Compose
         run: |
-          ssh -i key.pem root@${{ secrets.BEGET_HOST }} "
+          ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
             cd /root/app
             docker compose up -d --build
           "
