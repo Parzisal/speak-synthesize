@@ -10,8 +10,8 @@ COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt && \
     rm -rf /root/.cache /tmp/*
 
-COPY package.json .
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 
