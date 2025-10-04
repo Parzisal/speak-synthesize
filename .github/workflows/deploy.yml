@@ -30,14 +30,8 @@ jobs:
       - name: Build and run Docker container
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
-            cd /root/app || exit 1
-            # Остановить текущие сервисы и убрать орфанов
-            docker compose down --remove-orphans || true
-            # Собрать и запустить с пересборкой
-            docker compose up -d --build
-            # Опционально почистить dangling images
-            docker image prune -f || true
-          "
+            cd /root/app
+           docker compose build --no-cache && docker compose up -d
 
       - name: ✅ Deployment complete
         run: echo "🎉 Успешный деплой на Beget завершён!"
