@@ -9,8 +9,9 @@ services:
     ports:
       - "3000:3000"
     restart: always
-    volumes:
-      - .:/app
-      - /app/node_modules
+    # НЕ монтируем исходники в production, uncom для local
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
     working_dir: /app
     command: ["npm", "start"]
