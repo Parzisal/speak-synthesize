@@ -8,11 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Скачиваем код репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Настраиваем SSH ключ без passphrase
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -20,21 +18,19 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
-      # 3️⃣ Копируем проект на сервер
       - name: Copy project to Beget via SCP
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "rm -rf /root/app"
           scp -r -i ~/.ssh/id_rsa . root@${{ secrets.BEGET_HOST }}:/root/app
 
-      # 4️⃣ Строим и запускаем контейнер через Docker
-      - name: Build and run Docker container
+      - name: Build and run Docker on Beget
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
+            docker system prune -af --volumes &&
             cd /root/app &&
             docker compose build --no-cache &&
             docker compose up -d
           "
 
-      # 5️⃣ Завершение
       - name: ✅ Deployment complete
         run: echo "🎉 Успешный деплой на Beget завершён!"

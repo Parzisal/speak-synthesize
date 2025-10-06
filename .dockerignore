@@ -1,4 +1,6 @@
 node_modules
-__pycache__
-*.log
 .git
+__pycache__
+dist
+coverage
+*.log
