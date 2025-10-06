@@ -24,24 +24,20 @@ jobs:
       - name: Show target host
         run: echo "Deploying to ${{ secrets.BEGET_HOST }}"
 
-      # 4️⃣ Очищаем и создаём папку на сервере
-      - name: Prepare remote directory
+      # 4️⃣ Обновляем репозиторий на сервере
+      - name: Git pull on Beget
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
-            rm -rf /root/app &&
-            mkdir -p /root/app
+            if [ ! -d /root/app/.git ]; then
+              git clone --depth=1 -b main git@github.com:Parzisal/speak-synthesize /root/app
+            else
+              cd /root/app &&
+              git reset --hard &&
+              git pull origin main
+            fi
           "
 
-      # 5️⃣ Копируем проект через rsync (надёжнее, чем scp)
-      - name: Sync project to Beget via rsync
-        run: |
-          rsync -avz --delete \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='.github' \
-            -e "ssh -i ~/.ssh/id_rsa" ./ root@${{ secrets.BEGET_HOST }}:/root/app
-
-      # 6️⃣ Собираем и запускаем контейнер на сервере
+      # 5️⃣ Собираем и запускаем контейнер на сервере
       - name: Build and run Docker on Beget
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
@@ -51,6 +47,6 @@ jobs:
             docker compose up -d
           "
 
-      # 7️⃣ Финальный шаг
+      # 6️⃣ Финальный шаг
       - name: ✅ Deployment complete
-        run: echo "🎉 Успешный деплой на Beget завершён!"
+        run: echo "🎉 Успешный деплой через git pull завершён!"
