@@ -8,15 +8,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Получаем код из репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug host
-        run: echo "Deploying to ${{ secrets.BEGET_HOST }}"
-        
-      - name: Debug ssh
-        run: echo "Deploying to ${{ secrets.BEGET_SSH_KEY }}"
-        
+      # 2️⃣ Настраиваем SSH-доступ
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -24,11 +20,28 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
-      - name: Copy project to Beget via SCP
-        run: |
-          ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "rm -rf /root/app"
-          scp -r -i ~/.ssh/id_rsa . root@${{ secrets.BEGET_HOST }}:/root/app
+      # 3️⃣ Отладка: выводим хост
+      - name: Show target host
+        run: echo "Deploying to ${{ secrets.BEGET_HOST }}"
 
+      # 4️⃣ Очищаем и создаём папку на сервере
+      - name: Prepare remote directory
+        run: |
+          ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
+            rm -rf /root/app &&
+            mkdir -p /root/app
+          "
+
+      # 5️⃣ Копируем проект через rsync (надёжнее, чем scp)
+      - name: Sync project to Beget via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.github' \
+            -e "ssh -i ~/.ssh/id_rsa" ./ root@${{ secrets.BEGET_HOST }}:/root/app
+
+      # 6️⃣ Собираем и запускаем контейнер на сервере
       - name: Build and run Docker on Beget
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
@@ -38,5 +51,6 @@ jobs:
             docker compose up -d
           "
 
+      # 7️⃣ Финальный шаг
       - name: ✅ Deployment complete
         run: echo "🎉 Успешный деплой на Beget завершён!"
