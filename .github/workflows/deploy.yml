@@ -11,6 +11,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Debug host
+        run: echo "Deploying to ${{ secrets.BEGET_HOST }}"
+        
+      - name: Debug ssh
+        run: echo "Deploying to ${{ secrets.BEGET_SSH_KEY }}"
+        
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
