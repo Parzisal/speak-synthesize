@@ -8,11 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Получаем код из репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Настраиваем SSH-доступ
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -20,12 +18,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
-      # 3️⃣ Отладка: выводим хост
-      - name: Show target host
-        run: echo "Deploying to ${{ secrets.BEGET_HOST }}"
-
-      # 4️⃣ Обновляем репозиторий на сервере
-      - name: Git pull on Beget
+      - name: Git pull
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
             if [ ! -d /root/app/.git ]; then
@@ -37,8 +30,7 @@ jobs:
             fi
           "
 
-      # 5️⃣ Собираем и запускаем контейнер на сервере
-      - name: Build and run Docker on Beget
+      - name: Build and run Docker
         run: |
           ssh -i ~/.ssh/id_rsa root@${{ secrets.BEGET_HOST }} "
             docker system prune -af --volumes &&
@@ -49,4 +41,4 @@ jobs:
 
       # 6️⃣ Финальный шаг
       - name: ✅ Deployment complete
-        run: echo "🎉 Успешный деплой через git pull завершён!"
+        run: echo "🎉 Success"
