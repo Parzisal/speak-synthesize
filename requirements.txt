@@ -1,10 +1,5 @@
-torch==2.0.1+cpu
-torchaudio==2.0.2+cpu
+torch
+torchaudio
 pydub
 numpy
 omegaconf
-# old
-# fastapi
-# uvicorn
-# torch
-# pydub
