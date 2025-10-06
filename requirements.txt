@@ -1,4 +1,4 @@
-orch==2.0.1+cpu
+torch==2.0.1+cpu
 torchaudio==2.0.2+cpu
 pydub
 numpy
